@@ -17,9 +17,9 @@ const Dashboard = () => {
   ];
 
   const recentOrders = [
-    { id: 1, number: '#WU3D-4567', date: 'Sep 23, 2023', status: 'Delivered', total: '$149.99' },
-    { id: 2, number: '#WU3D-4566', date: 'Sep 21, 2023', status: 'Shipped', total: '$87.50' },
-    { id: 3, number: '#WU3D-4565', date: 'Sep 20, 2023', status: 'Processing', total: '$199.99' },
+    { id: 1, number: '#WU3D-4567', date: 'Sep 23, 2023', status: 'Delivered', total: 'GH₵149.99' },
+    { id: 2, number: '#WU3D-4566', date: 'Sep 21, 2023', status: 'Shipped', total: 'GH₵87.50' },
+    { id: 3, number: '#WU3D-4565', date: 'Sep 20, 2023', status: 'Processing', total: 'GH₵199.99' },
   ];
 
   const quickActions = [

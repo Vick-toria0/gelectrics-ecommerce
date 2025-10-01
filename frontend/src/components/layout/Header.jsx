@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationButton from '../notifications/NotificationButton';
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -20,7 +21,7 @@ const Header = () => {
           <Link to="/" className="text-2xl font-bold text-gray-900">
             Gelectrics
           </Link>
-          <nav className="flex items-center space-x-4">
+          <nav className="flex items-center space-x-2">
             <Link 
               to="/products" 
               className={`${isActive('/products') ? 'text-blue-600 font-medium' : 'text-gray-700 hover:text-blue-600'}`}
@@ -29,9 +30,10 @@ const Header = () => {
             </Link>
             <Link 
               to="/cart" 
-              className={`${isActive('/cart') ? 'text-blue-600 font-medium' : 'text-gray-700 hover:text-blue-600'}`}
+              className={`p-2 ${isActive('/cart') ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`}
+              title="Cart"
             >
-              Cart
+              <ShoppingCartIcon className="h-6 w-6" />
             </Link>
             
             {/* Notification Button */}
@@ -69,6 +71,7 @@ const Header = () => {
                 </Link>
               </>
             )}
+
           </nav>
         </div>
       </div>

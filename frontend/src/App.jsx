@@ -59,43 +59,52 @@ function App() {
       <WishlistProvider>
         <CartProvider>
           <NotificationProvider>
-            <Routes>
-              {/* Auth Routes - Outside PageLayout */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              
-              {/* All other routes wrapped in LayoutWrapper */}
-              <Route element={<LayoutWrapper />}>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                
-                {/* Protected Routes */}
-                <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
-                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-                <Route path="/profile" element={
-                  <PrivateRoute>
-                    <Profile />
-                  </PrivateRoute>
-                } />
-                <Route path="/wishlist" element={
-                  <PrivateRoute>
-                    <Wishlist />
-                  </PrivateRoute>
-                } /> 
-                <Route path="/admin/products" element={<PrivateRoute adminOnly><AdminProducts /></PrivateRoute>} />
-                
-                {/* 404 - Not Found */}
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </NotificationProvider>
-        </CartProvider>
-      </WishlistProvider>
-    </AuthProvider>
+              <Routes>
+                <Route element={<LayoutWrapper />}>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/products/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/checkout" element={
+                    <PrivateRoute>
+                      <Checkout />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/dashboard" element={
+                    <PrivateRoute>
+                      <Dashboard />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/profile" element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/wishlist" element={
+                    <PrivateRoute>
+                      <Wishlist />
+                    </PrivateRoute>
+                  } /> 
+                  <Route path="/admin/products" element={
+                    <PrivateRoute adminOnly>
+                      <AdminProducts />
+                    </PrivateRoute>
+                  } />
+                  
+                  {/* 404 - Not Found */}
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </NotificationProvider>
+          </CartProvider>
+        </WishlistProvider>
+      </AuthProvider>
   );
 }
 

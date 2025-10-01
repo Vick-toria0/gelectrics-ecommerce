@@ -160,11 +160,11 @@ const Cart = () => {
             <dl className="mt-6 space-y-4">
               <div className="flex items-center justify-between">
                 <dt className="text-sm text-gray-600">Subtotal</dt>
-                <dd className="text-sm font-medium text-gray-900">${getCartTotal().toFixed(2)}</dd>
+                <dd className="text-sm font-medium text-gray-900">GH₵{getCartTotal().toFixed(2)}</dd>
               </div>
               <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
                 <dt className="text-base font-medium text-gray-900">Order total</dt>
-                <dd className="text-base font-medium text-gray-900">${getCartTotal().toFixed(2)}</dd>
+                <dd className="text-base font-medium text-gray-900">GH₵{getCartTotal().toFixed(2)}</dd>
               </div>
             </dl>
 

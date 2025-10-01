@@ -2,7 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { MagnifyingGlassIcon, FunnelIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
+import { 
+  MagnifyingGlassIcon, 
+  FunnelIcon, 
+  ArrowsUpDownIcon, 
+  StarIcon,
+  ShoppingCartIcon,
+  EyeIcon
+} from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 
 const Products = () => {
@@ -34,6 +41,16 @@ const Products = () => {
     { value: 'name-desc', label: 'Name (Z-A)' },
     { value: 'price-asc', label: 'Price (Low to High)' },
     { value: 'price-desc', label: 'Price (High to Low)' },
+    { value: 'popular', label: 'Most Popular' },
+    { value: 'newest', label: 'Newest First' },
+  ];
+
+  const priceRanges = [
+    { id: 'all', name: 'All Prices' },
+    { id: '0-50', name: 'Under GH₵50' },
+    { id: '50-100', name: 'GH₵50 - GH₵100' },
+    { id: '100-200', name: 'GH₵100 - GH₵200' },
+    { id: '200+', name: 'Over GH₵200' },
   ];
 
   // This would typically be an API call
@@ -70,46 +87,52 @@ const Products = () => {
   }, []);
 
   // Process and filter products
-  const processedProducts = useMemo(() => {
-    let result = [...products];
-    const category = searchParams.get('category') || 'all';
-    const search = searchParams.get('q') || '';
-
-    // Apply category filter
-    if (category !== 'all') {
-      result = result.filter(product => product.category === category);
-    }
-
-    // Apply search filter
-    if (search.trim() !== '') {
-      const term = search.toLowerCase().trim();
-      result = result.filter(product => 
-        product.name.toLowerCase().includes(term) ||
-        (product.description && product.description.toLowerCase().includes(term))
-      );
-    }
-
-    // Apply sorting
-    if (sortConfig.key) {
-      result.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          product.category.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const selectedCategory = searchParams.get('category') || 'all';
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      
+      const priceRange = searchParams.get('price') || 'all';
+      let matchesPrice = true;
+      
+      if (priceRange !== 'all') {
+        if (priceRange.endsWith('+')) {
+          matchesPrice = product.price >= Number(priceRange.replace('+', ''));
+        } else {
+          const [min, max] = priceRange.split('-').map(Number);
+          matchesPrice = product.price >= min && product.price <= max;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    return result;
-  }, [products, searchParams, sortConfig]);
+      }
+      
+      return matchesSearch && matchesCategory && matchesPrice;
+    }).sort((a, b) => {
+      switch (sortConfig.key) {
+        case 'name':
+          return sortConfig.direction === 'asc' 
+            ? a.name.localeCompare(b.name)
+            : b.name.localeCompare(a.name);
+        case 'price':
+          return sortConfig.direction === 'asc' 
+            ? a.price - b.price 
+            : b.price - a.price;
+        case 'popular':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'newest':
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [products, searchTerm, sortConfig, searchParams]);
 
   // Get current products for pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = processedProducts.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(processedProducts.length / itemsPerPage);
+  const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -129,11 +152,26 @@ const Products = () => {
 
   // Handle sort change
   const handleSortChange = (e) => {
-    const [key, direction] = e.target.value.split('-');
-    setSortConfig({ key, direction });
-    setCurrentPage(1);
+    if (e.target.value === 'popular' || e.target.value === 'newest') {
+      setSortConfig({ key: e.target.value, direction: 'desc' });
+    } else {
+      const [key, direction] = e.target.value.split('-');
+      setSortConfig({ key, direction });
+    }
   };
 
+  // Handle price range filter
+  const handlePriceRangeChange = (range) => {
+    const params = new URLSearchParams(searchParams);
+    if (range === 'all') {
+      params.delete('price');
+    } else {
+      params.set('price', range);
+    }
+    setSearchParams(params);
+  };
+
+  // Handle category filter
   const handleCategoryChange = (categoryId) => {
     const params = new URLSearchParams(searchParams);
     if (categoryId === 'all') {
@@ -142,7 +180,6 @@ const Products = () => {
       params.set('category', categoryId);
     }
     setSearchParams(params);
-    setCurrentPage(1);
   };
 
   if (loading) {
@@ -197,281 +234,388 @@ const Products = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 md:py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8" id="products-heading">Our Products</h1>
-        
-        {/* Filters and Search */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
-          {/* Mobile filter button */}
-          <div className="md:hidden w-full">
-            <button
-              type="button"
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              aria-expanded={showMobileFilters}
-              aria-controls="mobile-filters"
-            >
-              <FunnelIcon className="h-5 w-5 mr-2 text-gray-500" aria-hidden="true" />
-              Filters
-            </button>
-          </div>
-
-          {/* Search */}
-          <div className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3">
-            <form onSubmit={handleSearch} role="search" aria-label="Products">
-              <label htmlFor="search" className="sr-only">Search products</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </div>
-                <input
-                  id="search"
-                  name="search"
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search products by name..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm"
-                  aria-describedby="search-description"
-                />
-              </div>
-              <p id="search-description" className="mt-1 text-sm text-gray-500 sr-only">
-                Search for products by name
-              </p>
-            </form>
-          </div>
-
-          {/* Sort - Hide on small screens, show on medium and up */}
-          <div className="hidden md:flex items-center">
-            <div className="flex items-center">
-              <ArrowsUpDownIcon className="h-5 w-5 text-gray-400 mr-2" aria-hidden="true" />
-              <label htmlFor="sort" className="mr-2 text-sm font-medium text-gray-700">
-                Sort by:
-              </label>
-              <select
-                id="sort"
-                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={`${sortConfig.key}-${sortConfig.direction}`}
-                onChange={handleSortChange}
-                aria-label="Sort products by"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          
-          {/* Mobile sort button */}
-          <div className="md:hidden w-full">
-            <select
-              id="mobile-sort"
-              className="block w-full pl-3 pr-10 py-3 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={`${sortConfig.key}-${sortConfig.direction}`}
-              onChange={handleSortChange}
-              aria-label="Sort products by"
-            >
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+    <div className="bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero section */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-8 mb-8 text-white">
+          <h1 className="text-3xl font-bold mb-2">Shop Electrical Supplies</h1>
+          <p className="text-blue-100">Find high-quality electrical components and tools for your projects</p>
         </div>
 
-        <div className="lg:grid lg:grid-cols-4 lg:gap-x-8">
-          {/* Category Filter - Desktop */}
-          <div className="hidden lg:block" aria-labelledby="desktop-categories-heading">
-            <h2 id="desktop-categories-heading" className="text-lg font-medium text-gray-900 mb-4">Categories</h2>
-            <nav className="space-y-2" aria-label="Product categories">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
-                  className={`block w-full text-left px-4 py-2.5 text-sm rounded-md transition-colors ${
-                    (searchParams.get('category') || 'all') === category.id
-                      ? 'bg-blue-50 text-blue-700 font-medium ring-2 ring-blue-500 ring-opacity-50'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  aria-current={(searchParams.get('category') || 'all') === category.id ? 'page' : undefined}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </nav>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar filters */}
+          <div className="w-full lg:w-64 flex-shrink-0">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              {/* Categories */}
+              <div className="mb-6">
+                <h3 className="font-medium text-gray-900 mb-3">Categories</h3>
+                <div className="space-y-2">
+                  {categories.map((category) => (
+                    <div key={category.id} className="flex items-center">
+                      <input
+                        id={`category-${category.id}`}
+                        name="category"
+                        type="radio"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        checked={(searchParams.get('category') || 'all') === category.id}
+                        onChange={() => handleCategoryChange(category.id)}
+                      />
+                      <label htmlFor={`category-${category.id}`} className="ml-3 text-sm text-gray-700 hover:text-gray-900 cursor-pointer">
+                        {category.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="font-medium text-gray-900 mb-3">Price Range</h3>
+                <div className="space-y-2">
+                  {priceRanges.map((range) => (
+                    <div key={range.id} className="flex items-center">
+                      <input
+                        id={`price-${range.id}`}
+                        name="price-range"
+                        type="radio"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        checked={(searchParams.get('price') || 'all') === range.id}
+                        onChange={() => handlePriceRangeChange(range.id)}
+                      />
+                      <label htmlFor={`price-${range.id}`} className="ml-3 text-sm text-gray-700 hover:text-gray-900 cursor-pointer">
+                        {range.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Mobile Category Filter */}
-          {showMobileFilters && (
-            <div id="mobile-filters" className="lg:hidden mb-6 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium text-gray-900">Categories</h2>
-                <button 
-                  type="button" 
-                  className="text-gray-400 hover:text-gray-500"
-                  onClick={() => setShowMobileFilters(false)}
-                  aria-label="Close filters"
+          {/* Main content */}
+          <div className="flex-1">
+            {/* Search and sort bar */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              {/* Search */}
+              <div className="relative flex-1 w-full sm:max-w-md">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition duration-150 ease-in-out"
+                />
+              </div>
+
+              {/* Sort */}
+              <div className="flex items-center w-full sm:w-auto">
+                <label htmlFor="sort" className="mr-2 text-sm font-medium text-gray-700 whitespace-nowrap">
+                  Sort by:
+                </label>
+                <select
+                  id="sort"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm rounded-md shadow-sm"
+                  value={['popular', 'newest'].includes(sortConfig.key) ? sortConfig.key : `${sortConfig.key}-${sortConfig.direction}`}
+                  onChange={handleSortChange}
                 >
-                  <span className="sr-only">Close menu</span>
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Mobile filter button */}
+              <button
+                type="button"
+                className="lg:hidden inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 w-full justify-center"
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+              >
+                <FunnelIcon className="h-5 w-5 mr-2 text-gray-400" />
+                {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
+              </button>
+            </div>
+
+            {/* Mobile Category Filter */}
+            {showMobileFilters && (
+              <div id="mobile-filters" className="lg:hidden mb-6 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium text-gray-900">Categories</h2>
+                  <button 
+                    type="button" 
+                    className="text-gray-400 hover:text-gray-500"
+                    onClick={() => setShowMobileFilters(false)}
+                    aria-label="Close filters"
+                  >
+                    <span className="sr-only">Close menu</span>
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <nav className="grid grid-cols-2 gap-3" aria-label="Product categories">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => {
+                        handleCategoryChange(category.id);
+                        setShowMobileFilters(false);
+                      }}
+                      className={`px-4 py-3 text-sm rounded-md text-center transition-colors ${
+                        (searchParams.get('category') || 'all') === category.id
+                          ? 'bg-blue-600 text-white font-medium ring-2 ring-blue-500 ring-offset-1'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                      aria-current={(searchParams.get('category') || 'all') === category.id ? 'page' : undefined}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            )}
+
+            {/* Products grid */}
+            {loading ? (
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 animate-pulse">
+                    <div className="h-48 bg-gray-200 w-full"></div>
+                    <div className="p-4">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-3"></div>
+                      <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="mt-8 text-center text-red-600 bg-red-50 p-4 rounded-lg">
+                <p className="font-medium">Error loading products</p>
+                <p className="text-sm mt-1">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="mt-2 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Retry
                 </button>
               </div>
-              <nav className="grid grid-cols-2 gap-3" aria-label="Product categories">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => {
-                      handleCategoryChange(category.id);
-                      setShowMobileFilters(false);
-                    }}
-                    className={`px-4 py-3 text-sm rounded-md text-center transition-colors ${
-                      (searchParams.get('category') || 'all') === category.id
-                        ? 'bg-blue-600 text-white font-medium ring-2 ring-blue-500 ring-offset-1'
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                    }`}
-                    aria-current={(searchParams.get('category') || 'all') === category.id ? 'page' : undefined}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </nav>
-            </div>
-          )}
-
-          {/* Product Grid */}
-          <div className="lg:col-span-3" role="region" aria-labelledby="products-heading">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 xl:gap-8">
-              {currentProducts.length > 0 ? (
-                currentProducts.map((product) => (
-                  <article 
-                    key={product.id} 
-                    className="group bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 h-full flex flex-col border border-transparent hover:border-blue-100 cursor-pointer"
-                    aria-labelledby={`product-${product.id}-title`}
-                    onClick={() => navigate(`/products/${product.id}`)}
-                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/products/${product.id}`)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="flex-1">
-                      <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80 relative">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleWishlist(product);
-                          }}
-                          className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-md z-10 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                          aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                        >
-                          {isInWishlist(product.id) ? (
-                            <HeartIconSolid className="h-5 w-5 text-red-500" aria-hidden="true" />
-                          ) : (
-                            <HeartIconSolid className="h-5 w-5 text-gray-400 hover:text-red-500" aria-hidden="true" />
-                          )}
-                        </button>
+            ) : filteredProducts.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                  {currentProducts.map((product) => (
+                    <div key={product.id} className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-blue-100">
+                      {/* Product image */}
+                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-xl bg-gray-100 relative">
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                          className="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                         />
+                        
+                        
+                        {/* Wishlist button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWishlist(product);
+                          }}
+                          className={`absolute top-3 right-3 p-2 rounded-full ${isInWishlist(product.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'} bg-white/90 backdrop-blur-sm shadow-sm hover:shadow transition-all duration-200`}
+                          aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                        >
+                          <HeartIconSolid className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                        </button>
+                        
+                        {/* Category tag */}
+                        <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium px-2.5 py-0.5 rounded-full">
+                          {product.category}
+                        </span>
                       </div>
-                      <div className="mt-4">
-                        <h3 id={`product-${product.id}-title`} className="text-sm font-medium text-gray-900 line-clamp-2 h-10">
-                          {product.name}
-                        </h3>
-                        <p className="mt-2 text-lg font-semibold text-gray-900">
-                          ${product.price.toFixed(2)}
-                          <span className="sr-only">dollars</span>
-                        </p>
+                      
+                      {/* Product info */}
+                      <div className="p-5">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
+                              {product.name}
+                            </h3>
+                            <div className="flex items-center mb-2">
+                              <div className="flex items-center">
+                                {[0, 1, 2, 3, 4].map((rating) => (
+                                  <StarIcon
+                                    key={rating}
+                                    className={`h-4 w-4 ${rating < (product.rating || 4) ? 'text-yellow-400' : 'text-gray-300'}`}
+                                    aria-hidden="true"
+                                  />
+                                ))}
+                              </div>
+                              <span className="ml-2 text-sm text-gray-500">({product.reviewCount || Math.floor(Math.random() * 100)})</span>
+                            </div>
+                          </div>
+                          <span className="text-lg font-bold text-blue-600">${product.price.toFixed(2)}</span>
+                        </div>
+                        
+                        <div className="mt-4 flex items-center justify-between">
+                          <button
+                            onClick={() => addToCart({ ...product, quantity: 1 })}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors duration-200 flex items-center justify-center"
+                          >
+                            <ShoppingCartIcon className="h-4 w-4 mr-2" />
+                            Add to Cart
+                          </button>
+                        </div>
+                        
+                        {/* Stock status */}
+                        {product.stock && (
+                          <div className="mt-3">
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div 
+                                className={`h-1.5 rounded-full ${product.stock > 20 ? 'bg-green-500' : product.stock > 10 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                style={{ width: `${Math.min(100, (product.stock / 50) * 100)}%` }}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {product.stock} left in stock
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <button
-                        onClick={() => addToCart(product)}
-                        className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium"
-                        aria-label={`Add ${product.name} to cart`}
-                      >
-                        Add to Cart
-                      </button>
-                    </div>
-                  </article>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-gray-500">No products found. Try adjusting your search or filter criteria.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <nav 
-                className="mt-12 flex items-center justify-between border-t border-gray-200 px-4 sm:px-0"
-                aria-label="Pagination"
-              >
-                <div className="-mt-px flex w-0 flex-1">
-                  <button
-                    onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
-                    disabled={currentPage === 1}
-                    className={`inline-flex items-center pt-4 pr-1 text-sm font-medium ${
-                      currentPage === 1 
-                        ? 'text-gray-300 cursor-not-allowed' 
-                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    } border-t-2 border-transparent`}
-                    aria-disabled={currentPage === 1}
-                    aria-label="Previous page"
-                  >
-                    <svg className="mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Previous
-                  </button>
-                </div>
-                
-                <div className="hidden md:-mt-px md:flex">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-                    <button
-                      key={number}
-                      onClick={() => paginate(number)}
-                      className={`inline-flex items-center px-4 pt-4 text-sm font-medium ${
-                        currentPage === number
-                          ? 'border-blue-500 text-blue-600 border-t-2'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2'
-                      }`}
-                      aria-current={currentPage === number ? 'page' : undefined}
-                      aria-label={`Page ${number}${currentPage === number ? ', current page' : ''}`}
-                    >
-                      {number}
-                    </button>
                   ))}
                 </div>
-                
-                <div className="-mt-px flex w-0 flex-1 justify-end">
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <nav className="mt-10 flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+                    <div className="flex flex-1 justify-between sm:hidden">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                    
+                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm text-gray-700">
+                          Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
+                          <span className="font-medium">
+                            {Math.min(currentPage * itemsPerPage, filteredProducts.length)}
+                          </span>{' '}
+                          of <span className="font-medium">{filteredProducts.length}</span> results
+                        </p>
+                      </div>
+                      <div>
+                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                          <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          >
+                            <span className="sr-only">Previous</span>
+                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                              />
+                            </svg>
+                          </button>
+                          
+                          {/* Page numbers */}
+                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                            
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === pageNum ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0'}`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })}
+                          
+                          <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          >
+                            <span className="sr-only">Next</span>
+                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                              <path
+                                fillRule="evenodd"
+                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                              />
+                            </svg>
+                          </button>
+                        </nav>
+                      </div>
+                    </div>
+                  </nav>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+                <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+                <div className="mt-6">
                   <button
-                    onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
-                    disabled={currentPage === totalPages}
-                    className={`inline-flex items-center pt-4 pl-1 text-sm font-medium ${
-                      currentPage === totalPages 
-                        ? 'text-gray-300 cursor-not-allowed' 
-                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    } border-t-2 border-transparent`}
-                    aria-disabled={currentPage === totalPages}
-                    aria-label="Next page"
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSearchParams({});
+                    }}
+                    className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                   >
-                    Next
-                    <svg className="ml-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <svg className="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path
+                        fillRule="evenodd"
+                        d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+                      />
                     </svg>
+                    Clear all filters
                   </button>
                 </div>
-              </nav>
+              </div>
             )}
           </div>
         </div>
