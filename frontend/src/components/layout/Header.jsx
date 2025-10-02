@@ -5,7 +5,7 @@ import NotificationButton from '../notifications/NotificationButton';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 const Header = () => {
-  const { user, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
   const location = useLocation();
   
   // Helper function to determine if a link is active
@@ -40,7 +40,7 @@ const Header = () => {
             <div className="ml-2">
               <NotificationButton />
             </div>
-            {user ? (
+            {currentUser ? (
               <>
                 <Link 
                   to="/dashboard" 
@@ -65,7 +65,7 @@ const Header = () => {
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  className={`px-4 py-2 rounded-md ${isActive('/register') ? 'bg-blue-700 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                 >
                   Sign Up
                 </Link>

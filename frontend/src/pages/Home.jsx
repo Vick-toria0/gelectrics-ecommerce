@@ -1,9 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CogIcon, UserCircleIcon, HomeIcon, ShieldCheckIcon, XMarkIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch featured products (using same mock data as Products page)
+    const fetchFeaturedProducts = async () => {
+      try {
+        // Simulate API call
+        setTimeout(() => {
+          const mockProducts = [
+            { id: 1, name: 'LED Bulb', price: 9.99, image: '/images/bulb.jpeg', category: 'lighting' },
+            { id: 2, name: 'Coaxial Cable', price: 14.99, image: '/images/coaxial.jpeg', category: 'cables' },
+            { id: 3, name: 'Explosion Proof Light', price: 199.99, image: '/images/ex-bd.jpeg', category: 'lighting' },
+            { id: 4, name: 'Tool Kit', price: 79.99, image: '/images/kit.jpeg', category: 'tools' },
+          ];
+          
+          setFeaturedProducts(mockProducts);
+          setLoading(false);
+        }, 500);
+      } catch (err) {
+        console.error('Failed to load featured products', err);
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
   return (
     <div className="bg-white relative">
       {/* Temporary Admin Navigation FAB */}
@@ -107,18 +134,53 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-2xl font-extrabold text-gray-900 mb-8">Featured Products</h2>
         <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {/* Placeholder for featured products */}
-          {[1, 2, 3, 4].map((product) => (
-            <div key={product} className="group">
-              <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden xl:aspect-w-7 xl:aspect-h-8">
-                <div className="w-full h-full object-center object-cover group-hover:opacity-75">
-                  <div className="h-full w-full bg-gray-300 animate-pulse"></div>
+          {loading ? (
+            // Loading skeleton
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="group">
+                <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden xl:aspect-w-7 xl:aspect-h-8">
+                  <div className="w-full h-full object-center object-cover group-hover:opacity-75">
+                    <div className="h-full w-full bg-gray-300 animate-pulse"></div>
+                  </div>
                 </div>
+                <h3 className="mt-4 text-sm text-gray-700">Loading product...</h3>
+                <p className="mt-1 text-lg font-medium text-gray-900">$---</p>
               </div>
-              <h3 className="mt-4 text-sm text-gray-700">Loading product...</h3>
-              <p className="mt-1 text-lg font-medium text-gray-900">$---</p>
-            </div>
-          ))}
+            ))
+          ) : (
+            // Actual products
+            featuredProducts.map((product) => (
+              <Link key={product.id} to={`/products`} onClick={() => window.scrollTo(0, 0)} className="group">
+                <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden xl:aspect-w-7 xl:aspect-h-8">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-64 object-center object-cover group-hover:opacity-75 transition-opacity duration-200"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/300x300/e5e7eb/6b7280?text=Product+Image';
+                    }}
+                  />
+                </div>
+                <div className="mt-4 flex justify-between items-start">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900">{product.name}</h3>
+                    <p className="mt-1 text-xs text-gray-500 capitalize">{product.category}</p>
+                  </div>
+                  <p className="text-lg font-bold text-blue-600">${product.price.toFixed(2)}</p>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+        <div className="mt-10 text-center">
+          <Link
+            to="/products"
+            onClick={() => window.scrollTo(0, 0)}
+            className="inline-block bg-blue-600 text-white py-3 px-8 border border-transparent rounded-md text-base font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+          >
+            View All Products
+          </Link>
         </div>
       </div>
     </div>

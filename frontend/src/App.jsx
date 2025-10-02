@@ -10,14 +10,13 @@ import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminProducts from './pages/admin/AdminProducts';
 import Wishlist from './pages/Wishlist';
 import NotFound from './pages/NotFound';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import AdminRoute from './components/auth/AdminRoute';
 
 // Protected Route Component - Temporarily bypassing authentication for testing
@@ -59,52 +58,54 @@ function App() {
       <WishlistProvider>
         <CartProvider>
           <NotificationProvider>
-              <Routes>
-                <Route element={<LayoutWrapper />}>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/products/:id" element={<ProductDetail />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  
-                  {/* Protected Routes */}
-                  <Route path="/checkout" element={
-                    <PrivateRoute>
-                      <Checkout />
-                    </PrivateRoute>
-                  } />
-                  <Route path="/dashboard" element={
-                    <PrivateRoute>
-                      <Dashboard />
-                    </PrivateRoute>
-                  } />
-                  <Route path="/profile" element={
-                    <PrivateRoute>
-                      <Profile />
-                    </PrivateRoute>
-                  } />
-                  <Route path="/wishlist" element={
-                    <PrivateRoute>
-                      <Wishlist />
-                    </PrivateRoute>
-                  } /> 
-                  <Route path="/admin/products" element={
-                    <PrivateRoute adminOnly>
-                      <AdminProducts />
-                    </PrivateRoute>
-                  } />
-                  
-                  {/* 404 - Not Found */}
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
-            </NotificationProvider>
-          </CartProvider>
-        </WishlistProvider>
-      </AuthProvider>
+            <Routes>
+              {/* Auth Routes - No Layout */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* Routes with Layout */}
+              <Route element={<LayoutWrapper />}>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/cart" element={<Cart />} />
+                
+                {/* Protected Routes */}
+                <Route path="/checkout" element={
+                  <PrivateRoute>
+                    <Checkout />
+                  </PrivateRoute>
+                } />
+                <Route path="/dashboard" element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                } />
+                <Route path="/profile" element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                } />
+                <Route path="/wishlist" element={
+                  <PrivateRoute>
+                    <Wishlist />
+                  </PrivateRoute>
+                } /> 
+                <Route path="/admin/products" element={
+                  <PrivateRoute adminOnly>
+                    <AdminProducts />
+                  </PrivateRoute>
+                } />
+                
+                {/* 404 - Not Found */}
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </NotificationProvider>
+        </CartProvider>
+      </WishlistProvider>
+    </AuthProvider>
   );
 }
 

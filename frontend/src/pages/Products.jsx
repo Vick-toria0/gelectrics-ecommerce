@@ -53,6 +53,11 @@ const Products = () => {
     { id: '200+', name: 'Over GH₵200' },
   ];
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // This would typically be an API call
   useEffect(() => {
     // Simulate API call
