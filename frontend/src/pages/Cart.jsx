@@ -7,29 +7,30 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <h2 className="mt-2 text-lg font-medium text-gray-900">Your cart is empty</h2>
-            <p className="mt-1 text-gray-500">Start shopping to add items to your cart.</p>
-            <div className="mt-6">
+      <div className="bg-blue-50 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 w-full">
+          <div className="text-center bg-white p-8 rounded-xl shadow-md border-2 border-blue-100">
+            <div className="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-blue-100">
+              <svg
+                className="h-12 w-12 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
+            </div>
+            <h2 className="mt-6 text-2xl font-bold text-blue-900">Your cart is empty</h2>
+            <p className="mt-2 text-blue-700">Start shopping to add items to your cart.</p>
+            <div className="mt-8">
               <Link
                 to="/products"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-6 py-3 border-2 border-transparent rounded-lg shadow-md text-base font-bold text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 transform hover:scale-105"
               >
                 Continue Shopping
               </Link>
@@ -41,24 +42,31 @@ const Cart = () => {
   }
 
   return (
-    <div className="bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Shopping Cart</h1>
+    <div className="bg-blue-50 min-h-screen py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center mb-8">
+          <Link to="/products" className="text-blue-700 hover:text-blue-900 mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+          </Link>
+          <h1 className="text-3xl font-extrabold tracking-tight text-blue-900">Shopping Cart</h1>
+        </div>
 
-        <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
-          <section aria-labelledby="cart-heading" className="lg:col-span-7">
+        <div className="mt-8 lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
+          <section aria-labelledby="cart-heading" className="lg:col-span-8">
             <h2 id="cart-heading" className="sr-only">
               Items in your shopping cart
             </h2>
 
-            <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
+            <ul className="border-t-2 border-b-2 border-blue-100 divide-y divide-blue-100 bg-white rounded-xl shadow-sm overflow-hidden">
               {items.map((item) => (
-                <li key={item.id} className="flex py-6 sm:py-10">
-                  <div className="flex-shrink-0">
+                <li key={item.id} className="flex p-6 hover:bg-blue-50 transition-colors duration-200">
+                  <div className="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 bg-blue-50 rounded-lg overflow-hidden">
                     <img
                       src={item.image || 'https://via.placeholder.com/150'}
                       alt={item.name}
-                      className="w-24 h-24 rounded-md object-center object-cover sm:w-48 sm:h-48"
+                      className="w-full h-full object-cover"
                     />
                   </div>
 
@@ -66,27 +74,27 @@ const Cart = () => {
                     <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
                       <div>
                         <div className="flex justify-between">
-                          <h3 className="text-sm">
+                          <h3 className="text-base sm:text-lg">
                             <Link
                               to={`/products/${item.id}`}
-                              className="font-medium text-gray-700 hover:text-gray-800"
+                              className="font-semibold text-blue-900 hover:text-blue-700 transition-colors duration-200"
                             >
                               {item.name}
                             </Link>
                           </h3>
                         </div>
-                        <p className="mt-1 text-sm font-medium text-gray-900">${item.price.toFixed(2)}</p>
+                        <p className="mt-1 text-base font-bold text-blue-800">GH₵{item.price.toFixed(2)}</p>
                       </div>
 
                       <div className="mt-4 sm:mt-0 sm:pr-9">
-                        <label htmlFor={`quantity-${item.id}`} className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor={`quantity-${item.id}`} className="block text-sm font-semibold text-blue-900 mb-1.5">
                           Quantity
                         </label>
                         <div className="flex items-center">
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                            className="p-1.5 text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 rounded-md transition-colors duration-200"
                             disabled={item.quantity <= 1}
                           >
                             <span className="sr-only">Decrease quantity</span>
@@ -104,12 +112,12 @@ const Cart = () => {
                               const value = parseInt(e.target.value) || 1;
                               updateQuantity(item.id, Math.max(1, value));
                             }}
-                            className="mx-2 w-16 text-center border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="mx-2 w-16 text-center border-2 border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-blue-900 font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                            className="p-1.5 text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 rounded-md transition-colors duration-200"
                           >
                             <span className="sr-only">Increase quantity</span>
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,10 +129,10 @@ const Cart = () => {
                         <div className="absolute top-0 right-0">
                           <button
                             type="button"
-                            className="-m-2 p-2 inline-flex text-gray-400 hover:text-gray-500"
+                            className="-m-2 p-2 inline-flex text-blue-400 hover:text-red-600 transition-colors duration-200"
                             onClick={() => removeFromCart(item.id)}
+                            aria-label="Remove item"
                           >
-                            <span className="sr-only">Remove</span>
                             <svg
                               className="h-5 w-5"
                               xmlns="http://www.w3.org/2000/svg"
@@ -134,7 +142,7 @@ const Cart = () => {
                             >
                               <path
                                 fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
                                 clipRule="evenodd"
                               />
                             </svg>
@@ -151,40 +159,40 @@ const Cart = () => {
           {/* Order summary */}
           <section
             aria-labelledby="summary-heading"
-            className="mt-16 bg-gray-50 rounded-lg px-4 py-6 sm:p-6 lg:p-8 lg:mt-0 lg:col-span-5"
+            className="mt-8 lg:mt-0 bg-white rounded-xl shadow-md border-2 border-blue-100 p-6 lg:col-span-4 h-fit sticky top-8"
           >
-            <h2 id="summary-heading" className="text-lg font-medium text-gray-900">
-              Order summary
+            <h2 id="summary-heading" className="text-xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6">
+              Order Summary
             </h2>
 
-            <dl className="mt-6 space-y-4">
+            <dl className="space-y-4">
               <div className="flex items-center justify-between">
-                <dt className="text-sm text-gray-600">Subtotal</dt>
-                <dd className="text-sm font-medium text-gray-900">GH₵{getCartTotal().toFixed(2)}</dd>
+                <dt className="text-base text-blue-700">Subtotal</dt>
+                <dd className="text-base font-semibold text-blue-900">GH₵{getCartTotal().toFixed(2)}</dd>
               </div>
-              <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-                <dt className="text-base font-medium text-gray-900">Order total</dt>
-                <dd className="text-base font-medium text-gray-900">GH₵{getCartTotal().toFixed(2)}</dd>
+              <div className="border-t-2 border-blue-100 pt-4 mt-4 flex items-center justify-between">
+                <dt className="text-lg font-bold text-blue-900">Order Total</dt>
+                <dd className="text-xl font-bold text-blue-800">GH₵{getCartTotal().toFixed(2)}</dd>
               </div>
             </dl>
 
-            <div className="mt-6">
+            <div className="mt-8">
               <Link
                 to="/checkout"
-                className="w-full bg-blue-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-blue-500 flex items-center justify-center"
+                className="w-full bg-blue-700 border-2 border-transparent rounded-lg shadow-md py-3 px-6 text-base font-bold text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center transition-colors duration-200 transform hover:scale-[1.02]"
               >
-                Checkout
+                Proceed to Checkout
               </Link>
             </div>
 
-            <div className="mt-6 text-center text-sm">
-              <p>
+            <div className="mt-6 text-center">
+              <p className="text-blue-700">
                 or{' '}
                 <Link
                   to="/products"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="font-semibold text-blue-700 hover:text-blue-900 transition-colors duration-200"
                 >
-                  Continue Shopping<span aria-hidden="true"> &rarr;</span>
+                  Continue Shopping <span aria-hidden="true">&rarr;</span>
                 </Link>
               </p>
             </div>

@@ -17,6 +17,7 @@ import Wishlist from './pages/Wishlist';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Contact from './pages/Contact';
 import AdminRoute from './components/auth/AdminRoute';
 
 // Protected Route Component - Temporarily bypassing authentication for testing
@@ -70,6 +71,7 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/contact" element={<Contact />} />
                 
                 {/* Protected Routes */}
                 <Route path="/checkout" element={

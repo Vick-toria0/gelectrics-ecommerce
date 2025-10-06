@@ -239,33 +239,40 @@ const Products = () => {
   }
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-8 mb-8 text-white">
+        <div className="bg-gradient-to-r from-blue-700 to-blue-900 rounded-xl p-8 mb-8 text-white shadow-lg">
           <h1 className="text-3xl font-bold mb-2">Shop Electrical Supplies</h1>
-          <p className="text-blue-100">Find high-quality electrical components and tools for your projects</p>
+          <p className="text-blue-100 opacity-90">Find high-quality electrical components and tools for your projects</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar filters */}
-          <div className="w-full lg:w-64 flex-shrink-0">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="w-full lg:w-72 flex-shrink-0">
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
               {/* Categories */}
               <div className="mb-6">
                 <h3 className="font-medium text-gray-900 mb-3">Categories</h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
-                    <div key={category.id} className="flex items-center">
+                    <div key={category.id} className="flex items-center group">
                       <input
                         id={`category-${category.id}`}
                         name="category"
                         type="radio"
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        className="h-4 w-4 text-blue-700 focus:ring-2 focus:ring-blue-500 border-gray-400"
                         checked={(searchParams.get('category') || 'all') === category.id}
                         onChange={() => handleCategoryChange(category.id)}
                       />
-                      <label htmlFor={`category-${category.id}`} className="ml-3 text-sm text-gray-700 hover:text-gray-900 cursor-pointer">
+                      <label 
+                        htmlFor={`category-${category.id}`} 
+                        className={`ml-3 text-sm font-medium cursor-pointer transition-colors ${
+                          (searchParams.get('category') || 'all') === category.id 
+                            ? 'text-blue-800' 
+                            : 'text-gray-800 hover:text-blue-700'
+                        }`}
+                      >
                         {category.name}
                       </label>
                     </div>
@@ -278,16 +285,23 @@ const Products = () => {
                 <h3 className="font-medium text-gray-900 mb-3">Price Range</h3>
                 <div className="space-y-2">
                   {priceRanges.map((range) => (
-                    <div key={range.id} className="flex items-center">
+                    <div key={range.id} className="flex items-center group">
                       <input
                         id={`price-${range.id}`}
                         name="price-range"
                         type="radio"
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        className="h-4 w-4 text-blue-700 focus:ring-2 focus:ring-blue-500 border-gray-400"
                         checked={(searchParams.get('price') || 'all') === range.id}
                         onChange={() => handlePriceRangeChange(range.id)}
                       />
-                      <label htmlFor={`price-${range.id}`} className="ml-3 text-sm text-gray-700 hover:text-gray-900 cursor-pointer">
+                      <label 
+                        htmlFor={`price-${range.id}`} 
+                        className={`ml-3 text-sm font-medium cursor-pointer transition-colors ${
+                          (searchParams.get('price') || 'all') === range.id 
+                            ? 'text-blue-800' 
+                            : 'text-gray-800 hover:text-blue-700'
+                        }`}
+                      >
                         {range.name}
                       </label>
                     </div>
@@ -300,7 +314,7 @@ const Products = () => {
           {/* Main content */}
           <div className="flex-1">
             {/* Search and sort bar */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               {/* Search */}
               <div className="relative flex-1 w-full sm:max-w-md">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -311,7 +325,7 @@ const Products = () => {
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition duration-150 ease-in-out"
+                  className="block w-full pl-10 pr-3 py-2 border-2 border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
                 />
               </div>
 
@@ -322,7 +336,7 @@ const Products = () => {
                 </label>
                 <select
                   id="sort"
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm rounded-md shadow-sm"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-500 sm:text-sm rounded-md shadow-sm"
                   value={['popular', 'newest'].includes(sortConfig.key) ? sortConfig.key : `${sortConfig.key}-${sortConfig.direction}`}
                   onChange={handleSortChange}
                 >
@@ -337,7 +351,7 @@ const Products = () => {
               {/* Mobile filter button */}
               <button
                 type="button"
-                className="lg:hidden inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 w-full justify-center"
+                className="lg:hidden inline-flex items-center px-4 py-2.5 border-2 border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 w-full justify-center transition-colors duration-200"
                 onClick={() => setShowMobileFilters(!showMobileFilters)}
               >
                 <FunnelIcon className="h-5 w-5 mr-2 text-gray-400" />
@@ -436,7 +450,7 @@ const Products = () => {
                         </button>
                         
                         {/* Category tag */}
-                        <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        <span className="absolute top-3 left-3 bg-blue-700 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
                           {product.category}
                         </span>
                       </div>
@@ -467,7 +481,7 @@ const Products = () => {
                         <div className="mt-4 flex items-center justify-between">
                           <button
                             onClick={() => addToCart({ ...product, quantity: 1 })}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors duration-200 flex items-center justify-center"
+                            className="flex-1 bg-blue-700 hover:bg-blue-800 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
                           >
                             <ShoppingCartIcon className="h-4 w-4 mr-2" />
                             Add to Cart
@@ -477,13 +491,21 @@ const Products = () => {
                         {/* Stock status */}
                         {product.stock && (
                           <div className="mt-3">
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                               <div 
-                                className={`h-1.5 rounded-full ${product.stock > 20 ? 'bg-green-500' : product.stock > 10 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                className={`h-2 rounded-full ${
+                                  product.stock > 20 ? 'bg-green-600' : 
+                                  product.stock > 10 ? 'bg-yellow-500' : 
+                                  'bg-red-600'
+                                }`}
                                 style={{ width: `${Math.min(100, (product.stock / 50) * 100)}%` }}
                               ></div>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className={`text-xs font-medium mt-1 ${
+                              product.stock > 20 ? 'text-green-700' : 
+                              product.stock > 10 ? 'text-yellow-700' : 
+                              'text-red-700'
+                            }`}>
                               {product.stock} left in stock
                             </p>
                           </div>
@@ -609,7 +631,7 @@ const Products = () => {
                       setSearchTerm('');
                       setSearchParams({});
                     }}
-                    className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    className="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 transition-colors duration-200"
                   >
                     <svg className="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path

@@ -25,17 +25,12 @@ const schema = yup.object().shape({
   }),
   state: yup.string().when('deliveryMethod', {
     is: 'delivery',
-    then: (schema) => schema.required('State/Province is required for delivery'),
+    then: (schema) => schema.required('Region is required for delivery'),
     otherwise: (schema) => schema.notRequired()
   }),
   postalCode: yup.string().when('deliveryMethod', {
     is: 'delivery',
     then: (schema) => schema.required('Postal code is required for delivery'),
-    otherwise: (schema) => schema.notRequired()
-  }),
-  country: yup.string().when('deliveryMethod', {
-    is: 'delivery',
-    then: (schema) => schema.required('Country is required for delivery'),
     otherwise: (schema) => schema.notRequired()
   }),
   // Removed pickupLocation validation since we only have one store
@@ -170,50 +165,50 @@ const Checkout = () => {
   }
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-blue-50">
       <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Checkout</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-blue-900">Checkout</h1>
 
         <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12">
           <div className="lg:col-span-7">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {/* Billing Information */}
-              <section aria-labelledby="billing-heading">
-                <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
+              <section aria-labelledby="billing-heading" className="space-y-6">
+                <h2 id="billing-heading" className="text-2xl font-bold text-blue-900 border-b-2 border-blue-200 pb-2 mb-4">
                   Billing Information
                 </h2>
 
-                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                      First name <span className="text-red-500">*</span>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      First name <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
                         type="text"
                         id="firstName"
                         {...register('firstName')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.firstName ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.firstName ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.firstName && (
-                        <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
+                        <p className="mt-1 text-sm font-medium text-red-600">{errors.firstName.message}</p>
                       )}
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                      Last name <span className="text-red-500">*</span>
+                  <div className="space-y-2">
+                    <label htmlFor="lastName" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Last name <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
                         type="text"
                         id="lastName"
                         {...register('lastName')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.lastName ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.lastName ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.lastName && (
@@ -222,17 +217,17 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email address <span className="text-red-500">*</span>
+                  <div className="sm:col-span-2 space-y-2">
+                    <label htmlFor="email" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Email address <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
                         type="email"
                         id="email"
                         {...register('email')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.email ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.email ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.email && (
@@ -248,8 +243,8 @@ const Checkout = () => {
                 <h2 id="delivery-method-heading" className="text-lg font-medium text-gray-900">
                   Delivery Method
                 </h2>
-                <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-                  <label className="relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer hover:border-gray-400">
+                <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
+                  <label className="relative bg-white border-2 border-blue-100 rounded-lg shadow-sm p-6 flex cursor-pointer hover:border-blue-400 transition-all duration-200 hover:shadow-md">
                     <input
                       type="radio"
                       value="delivery"
@@ -269,10 +264,10 @@ const Checkout = () => {
                       </div>
                     </div>
                     <svg className="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" fill="#1e40af" />
                     </svg>
                   </label>
-                  <label className="relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer hover:border-gray-400">
+                  <label className="relative bg-white border-2 border-blue-100 rounded-lg shadow-sm p-6 flex cursor-pointer hover:border-blue-400 transition-all duration-200 hover:shadow-md">
                     <input
                       type="radio"
                       value="pickup"
@@ -292,7 +287,7 @@ const Checkout = () => {
                       </div>
                     </div>
                     <svg className="h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" fill="#1e40af" />
                     </svg>
                   </label>
                 </div>
@@ -300,23 +295,23 @@ const Checkout = () => {
 
               {/* Shipping Address - Conditionally shown for delivery */}
               {deliveryMethod === 'delivery' && (
-                <section aria-labelledby="shipping-heading">
-                  <h2 id="shipping-heading" className="text-lg font-medium text-gray-900">
+                <section aria-labelledby="shipping-heading" className="space-y-6">
+                  <h2 id="shipping-heading" className="text-2xl font-bold text-blue-900 border-b-2 border-blue-200 pb-2 mb-4">
                     Shipping Address
                   </h2>
 
-                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                      Address <span className="text-red-500">*</span>
+                <div className="space-y-6">
+                  <div className="sm:col-span-2 space-y-2">
+                    <label htmlFor="address" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Address <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
                         type="text"
                         id="address"
                         {...register('address')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.address ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.address ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.address && (
@@ -325,17 +320,17 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                      City <span className="text-red-500">*</span>
+                  <div className="space-y-2">
+                    <label htmlFor="city" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      City <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
                         type="text"
                         id="city"
                         {...register('city')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.city ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.city ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.city && (
@@ -344,70 +339,58 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                      State / Province <span className="text-red-500">*</span>
+                  <div className="space-y-2">
+                    <label htmlFor="state" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Region <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
-                      <input
-                        type="text"
+                      <select
                         id="state"
                         {...register('state')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.state ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.state ? 'border-red-400' : 'border-gray-300'
                         }`}
-                      />
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Select a region</option>
+                        <option value="Ahafo">Ahafo Region</option>
+                        <option value="Ashanti">Ashanti Region</option>
+                        <option value="Bono">Bono Region</option>
+                        <option value="Bono East">Bono East Region</option>
+                        <option value="Central">Central Region</option>
+                        <option value="Eastern">Eastern Region</option>
+                        <option value="Greater Accra">Greater Accra Region</option>
+                        <option value="North East">North East Region</option>
+                        <option value="Northern">Northern Region</option>
+                        <option value="Oti">Oti Region</option>
+                        <option value="Savannah">Savannah Region</option>
+                        <option value="Upper East">Upper East Region</option>
+                        <option value="Upper West">Upper West Region</option>
+                        <option value="Volta">Volta Region</option>
+                        <option value="Western">Western Region</option>
+                        <option value="Western North">Western North Region</option>
+                      </select>
                       {errors.state && (
                         <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
                       )}
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
-                      Postal code <span className="text-red-500">*</span>
+                  <div className="space-y-2">
+                    <label htmlFor="postalCode" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Postal code <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
                         type="text"
                         id="postalCode"
                         {...register('postalCode')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.postalCode ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.postalCode ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.postalCode && (
                         <p className="mt-1 text-sm text-red-600">{errors.postalCode.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                      Country <span className="text-red-500">*</span>
-                    </label>
-                    <div className="mt-1">
-                      <select
-                        id="country"
-                        {...register('country')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.country ? 'border-red-300' : ''
-                        }`}
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          Select a country
-                        </option>
-                        <option value="US">United States</option>
-                        <option value="CA">Canada</option>
-                        <option value="UK">United Kingdom</option>
-                        <option value="AU">Australia</option>
-                        <option value="DE">Germany</option>
-                        <option value="FR">France</option>
-                        <option value="JP">Japan</option>
-                      </select>
-                      {errors.country && (
-                        <p className="mt-1 text-sm text-red-600">{errors.country.message}</p>
                       )}
                     </div>
                   </div>
@@ -445,14 +428,14 @@ const Checkout = () => {
 
               {/* Payment */}
               <section aria-labelledby="payment-heading">
-                <h2 id="payment-heading" className="text-lg font-medium text-gray-900">
+                <h2 id="payment-heading" className="text-2xl font-bold text-blue-900 border-b-2 border-blue-200 pb-2 mb-4">
                   Payment Information
                 </h2>
 
                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">
-                      Card number <span className="text-red-500">*</span>
+                  <div className="sm:col-span-2 space-y-2">
+                    <label htmlFor="cardNumber" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Card number <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
@@ -460,8 +443,8 @@ const Checkout = () => {
                         id="cardNumber"
                         placeholder="0000 0000 0000 0000"
                         {...register('cardNumber')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.cardNumber ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.cardNumber ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.cardNumber && (
@@ -470,9 +453,9 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="cardExpiry" className="block text-sm font-medium text-gray-700">
-                      Expiration date (MM/YY) <span className="text-red-500">*</span>
+                  <div className="space-y-2">
+                    <label htmlFor="cardExpiry" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      Expiration date (MM/YY) <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
@@ -480,8 +463,8 @@ const Checkout = () => {
                         id="cardExpiry"
                         placeholder="MM/YY"
                         {...register('cardExpiry')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.cardExpiry ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.cardExpiry ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.cardExpiry && (
@@ -490,9 +473,9 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="cardCvc" className="block text-sm font-medium text-gray-700">
-                      CVC <span className="text-red-500">*</span>
+                  <div className="space-y-2">
+                    <label htmlFor="cardCvc" className="block text-base font-semibold text-blue-900 mb-1.5">
+                      CVC <span className="text-red-600">*</span>
                     </label>
                     <div className="mt-1">
                       <input
@@ -500,8 +483,8 @@ const Checkout = () => {
                         id="cardCvc"
                         placeholder="CVC"
                         {...register('cardCvc')}
-                        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                          errors.cardCvc ? 'border-red-300' : ''
+                        className={`block w-full text-base rounded-lg border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-500 py-3 px-4 ${
+                          errors.cardCvc ? 'border-red-400' : 'border-gray-300'
                         }`}
                       />
                       {errors.cardCvc && (
@@ -574,7 +557,7 @@ const Checkout = () => {
                         </div>
 
                         <div className="ml-4 flex-1 flex flex-col">
-                          <div>
+                          <div className="space-y-2">
                             <div className="flex justify-between text-base font-medium text-gray-900">
                               <h3>{item.name}</h3>
                               <p className="ml-4">${(item.price * item.quantity).toFixed(2)}</p>
